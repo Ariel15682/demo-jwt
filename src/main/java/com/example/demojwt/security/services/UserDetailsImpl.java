@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.io.Serial;
-import com.bezkoder.springjwt.domain.User;
+
 
 public class UserDetailsImpl implements UserDetails {
 

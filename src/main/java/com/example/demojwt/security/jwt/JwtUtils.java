@@ -14,7 +14,6 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.web.util.WebUtils;
-import com.bezkoder.springjwt.security.services.UserDetailsImpl;
 //import org.springframework.security.core.Authentication;
 
 /**
