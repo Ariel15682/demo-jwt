@@ -275,7 +275,6 @@ demo-jwt/
  │      └── data.sql
  │
  ├── .gitignore
- ├── LICENSE
  ├── register.png
  ├── login.png
  ├── README.md
@@ -284,7 +283,7 @@ demo-jwt/
 ```
 
 
-## See the images, register.png and login.png, in the project path:
+## See images, register.png and login.png, in the project path:
 
 ### Register: 
 http://localhost:8080/api/auth/signup
