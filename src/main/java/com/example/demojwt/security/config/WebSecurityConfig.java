@@ -5,10 +5,12 @@ import com.example.demojwt.security.jwt.AuthTokenFilter;
 import com.example.demojwt.security.services.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,6 +21,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 //import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 //import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -92,11 +96,14 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
         // Cross-site Request Forgery CSRF
         // CORS (Cross-Origin-Resource-Sharing)
         http
-                // Enable CORS
-                //.cors(Customizer.withDefaults())
+                // Enable CORS default
+                //.cors(Customizer.withDefaults()) // (disable) .cors(cors -> cors.disable());
                 //Disable CSRF
-                //.csrf((protection) -> protection.ignoringRequestMatchers(toH2Console())
+                //.csrf((protection) -> protection.ignoringRequestMatchers(h2ConsolePath))
                 .csrf(AbstractHttpConfigurer::disable) //.csrf(csrf -> csrf.disable())
+                //Enable CSRF
+                //.csrf(Customizer.withDefaults())
+                //.csrf((csrf) -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 // Set unauthorized requests exception handler
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 // Set session management to stateless
@@ -105,12 +112,13 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/api/auth/**").permitAll()
                                 //.requestMatchers(HttpMethod.POST,"/api/auth/signin/**").permitAll()
+                                .requestMatchers("/api/auth/signup/**").permitAll()
                                 .requestMatchers("/api/auth/signin/**").permitAll()
+                                .requestMatchers("/api/auth/signout/**").permitAll()
                                 .requestMatchers(antMatcher(h2ConsolePath + "/**")).permitAll()
                                 //.requestMatchers("/v3/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**").permitAll() // Swagger 3
                                 //.requestMatchers(AUTH_WHITE_LIST).permitAll()
-                                .anyRequest().authenticated() //el resto esta capado
-                );
+                                .anyRequest().authenticated()); //el resto esta capado
 
         // This will allow frames with same origin which is much more safe
         // fix H2 database console: Refused to display ' in a frame because it set 'X-Frame-Options' to 'deny'
