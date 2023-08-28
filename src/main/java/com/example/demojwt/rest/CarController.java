@@ -109,12 +109,6 @@ public class CarController {
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping("/cars/hello")
-    public  ResponseEntity<String> hello(){ return ResponseEntity.ok("Hello");}
-
-    @GetMapping("/cars/hello2")
-    public  ResponseEntity<MessageDTO> hello2(){ return ResponseEntity.ok(new MessageDTO("Hello"));}
-
     @DeleteMapping("/cars/deletemany")
     public ResponseEntity<Car> deleteMany(@RequestBody CarListDTO carListDto){
 
