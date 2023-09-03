@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -53,42 +54,30 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
 
-    @Bean
-    public AuthTokenFilter authenticationJwtTokenFilter() {
-        return new AuthTokenFilter();
-    }
-
-//  @Override
-//  public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-//    authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
-//  }
-
+//    @Autowired
+//    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+//        auth.authenticationProvider(daoAuthenticationProvider());
+//    }
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-
-        authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-
-        return authProvider;
-    }
-
-//  @Bean
-//  @Override
-//  public AuthenticationManager authenticationManagerBean() throws Exception {
-//    return super.authenticationManagerBean();
-//  }
-
+//    @Bean
+//    public DaoAuthenticationProvider daoAuthenticationProvider() {
+//        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+//
+//        authProvider.setUserDetailsService(userDetailsService);
+//        authProvider.setPasswordEncoder(passwordEncoder());
+//
+//        return authProvider;
+//    }
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 
+    @Bean
+    public AuthTokenFilter authenticationJwtTokenFilter() { return new AuthTokenFilter(); }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -96,7 +85,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
         // CORS (Cross-Origin-Resource-Sharing)
         http
                 // Enable CORS default
-                //.cors(Customizer.withDefaults()) // (disable) .cors(cors -> cors.disable());
+                //.cors(Customizer.withDefaults()) // (disable) .cors(cors -> cors.disable())
                 //Disable CSRF
                 //.csrf((protection) -> protection.ignoringRequestMatchers(h2ConsolePath))
                 .csrf(AbstractHttpConfigurer::disable) //.csrf(csrf -> csrf.disable())
@@ -123,7 +112,8 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
         // fix H2 database console: Refused to display ' in a frame because it set 'X-Frame-Options' to 'deny'
         http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)); // (Lambda) (frameOption -> frameOption.sameOrigin()));
 
-        http.authenticationProvider(authenticationProvider());
+
+//        http.authenticationProvider(daoAuthenticationProvider());
 
         // Add JWT token filter
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
@@ -136,21 +126,4 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 //        return (web) -> web.ignoring().requestMatchers(new AntPathRequestMatcher(h2ConsolePath));
 //    }
 
-//    /**
-//     * Configuracion global de CORS para toda la aplicacion
-//     */
-//    // Prohibir que se acceda a nuestro Backend desde determinados dominios y solo desde el que queremos
-//    @Bean
-//    CorsConfigurationSource corsConfigurationSource(){
-//        CorsConfiguration configuration = new CorsConfiguration();
-//        //configuration.setAllowedOrigins(List.of("http://localhost:8080", "https://angular-springboot-beta.vercel.app"));
-//        //configuration.setAllowedOriginPatterns(List.of("http://localhost:8080", "https://angular-springboot-beta.vercel.app"));
-//        configuration.setAllowedOriginPatterns(List.of("http://localhost:8080"));
-//        configuration.setAllowedMethods(List.of("GET", "POST", "OPTIONS", "DELETE", "PUT", "PATCH"));
-//        configuration.setAllowedHeaders(List.of("Access-Control-Allow-Origin", "X-Requested with", "Origins", "Content-Type", "Accept", "Authorization"));
-//        configuration.setAllowCredentials(true);
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", configuration);
-//        return source;
-//    }
 }
